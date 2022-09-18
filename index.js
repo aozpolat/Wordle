@@ -44,6 +44,7 @@ const validButNotTrue = (wordOfDay) => {
     }
   }
   currentRow++;
+  if (currentRow == ROW_SIZE) endGame = true;
   currentIndex = 0;
   currentWord = "";
 };
@@ -56,42 +57,6 @@ const validateWord = async () => {
   res = await res.json();
   return res.validWord;
 };
-
-const main = () => {
-  document.addEventListener("keydown", async (e) => {
-    if (!endGame) {
-      if (e.key == "Enter" && currentWord.length == 5) {
-        const wordOfDay = await getTodaysWord();
-        if (currentWord == wordOfDay) {
-          youWin();
-          return;
-        }
-        let isValid = await validateWord();
-        if (!isValid) {
-          for (let i = 0; i < currentWord.length; i++) {
-            letterBoxs[currentRow * WORD_SIZE + i].classList.remove("invalid");
-
-            setTimeout(() => {
-              letterBoxs[currentRow * WORD_SIZE + i].classList.add("invalid");
-            }, 10);
-          }
-        } else {
-          //valid
-          validButNotTrue(wordOfDay);
-        }
-      } else if (e.key == "Backspace") {
-        handleBackspace();
-      } else if (isLetter(e.key)) {
-        handleLetter(e.key.toUpperCase());
-      }
-      console.log(currentWord, currentIndex);
-    }
-
-    // console.log(currentWord);
-  });
-};
-
-main();
 
 const handleBackspace = () => {
   if (currentIndex == 0) return;
@@ -141,3 +106,37 @@ const createMap = (word) => {
   }
   return obj;
 };
+
+const main = () => {
+  document.addEventListener("keydown", async (e) => {
+    if (!endGame) {
+      if (e.key == "Enter" && currentWord.length == 5) {
+        const wordOfDay = await getTodaysWord();
+        if (currentWord == wordOfDay) {
+          youWin();
+          return;
+        }
+        let isValid = await validateWord();
+        if (!isValid) {
+          for (let i = 0; i < currentWord.length; i++) {
+            letterBoxs[currentRow * WORD_SIZE + i].classList.remove("invalid");
+
+            setTimeout(() => {
+              letterBoxs[currentRow * WORD_SIZE + i].classList.add("invalid");
+            }, 10);
+          }
+        } else {
+          //valid
+          validButNotTrue(wordOfDay);
+        }
+      } else if (e.key == "Backspace") {
+        handleBackspace();
+      } else if (isLetter(e.key)) {
+        handleLetter(e.key.toUpperCase());
+      }
+      console.log(currentWord, currentIndex);
+    }
+  });
+};
+
+main();
