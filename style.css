@@ -13,6 +13,7 @@ body h1 {
   font-family: "Ms Madi", cursive;
   font-size: 6rem;
 }
+
 .test {
   display: flex;
   flex-direction: column;
@@ -117,4 +118,12 @@ body h1 {
 
 .background {
   opacity: 0.5;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.loading {
+  animation: move 1s infinite ease;
 }

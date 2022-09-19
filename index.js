@@ -6,11 +6,26 @@ let currentIndex = 0;
 let currentRow = 0;
 let endGame = false;
 let wordMap = {};
+let loading = false;
 
 const getTodaysWord = async () => {
+  waitForApiData();
   let res = await fetch("https://words.dev-apis.com/word-of-the-day");
   res = await res.json();
+  fethedApiData();
   return res.word.toUpperCase();
+};
+
+const waitForApiData = () => {
+  loading = true;
+  const loadingEl = document.querySelector(".loading");
+  loadingEl.classList.remove("hidden");
+};
+
+const fethedApiData = () => {
+  loading = false;
+  const loadingEl = document.querySelector(".loading");
+  loadingEl.classList.add("hidden");
 };
 
 const youWin = () => {
@@ -50,11 +65,13 @@ const validButNotTrue = (wordOfDay) => {
 };
 
 const validateWord = async () => {
+  waitForApiData();
   res = await fetch("https://words.dev-apis.com/validate-word", {
     method: "POST",
     body: JSON.stringify({ word: currentWord }),
   });
   res = await res.json();
+  fethedApiData();
   return res.validWord;
 };
 
@@ -71,18 +88,15 @@ const handleBackspace = () => {
 };
 
 const handleLetter = (letter) => {
-  if (currentIndex < 5) {
+  if (currentIndex == WORD_SIZE) {
+    const currentBox = letterBoxs[currentRow * WORD_SIZE + currentIndex - 1];
+    currentBox.innerText = letter;
+    currentWord = currentWord.substring(0, WORD_SIZE - 1) + letter;
+  }
+  if (currentIndex < WORD_SIZE) {
     const currentBox = letterBoxs[currentRow * WORD_SIZE + currentIndex];
     currentBox.innerText = letter;
-  }
-  if (currentWord.length <= 5) {
-    if (currentWord.length == 5) {
-      currentWord = currentWord.substring(0, 4) + letter;
-    } else {
-      currentWord += letter;
-    }
-  }
-  if (currentIndex <= 4) {
+    currentWord += letter;
     currentIndex++;
   }
 };
@@ -107,11 +121,11 @@ const createMap = (word) => {
   return obj;
 };
 
-const main = () => {
+const main = async () => {
+  const wordOfDay = await getTodaysWord();
   document.addEventListener("keydown", async (e) => {
-    if (!endGame) {
+    if (!endGame && !loading) {
       if (e.key == "Enter" && currentWord.length == 5) {
-        const wordOfDay = await getTodaysWord();
         if (currentWord == wordOfDay) {
           youWin();
           return;
